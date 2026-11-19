@@ -1,0 +1,70 @@
+CREATE TABLE cinema (
+    id BIGINT PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE room (
+    id BIGINT PRIMARY KEY NOT NULL,
+    number VARCHAR(50) NOT NULL,
+    cinema_id BIGINT NOT NULL,
+    CONSTRAINT fk_room_cinema FOREIGN KEY (cinema_id) REFERENCES cinema (id)
+);
+
+CREATE TABLE movie (
+    id BIGINT PRIMARY KEY NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    poster_url VARCHAR(512),
+    genre VARCHAR(50) NOT NULL,
+    duration_in_minutes INT NOT NULL,
+    age_rating VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE seat (
+    id BIGINT PRIMARY KEY NOT NULL,
+    room_id BIGINT NOT NULL,
+    seat_row VARCHAR(10) NOT NULL,
+    seat_number VARCHAR(20) NOT NULL,
+    CONSTRAINT fk_seat_room FOREIGN KEY (room_id) REFERENCES room (id)
+);
+
+CREATE TABLE showtime (
+    id BIGINT PRIMARY KEY NOT NULL,
+    room_id BIGINT NOT NULL,
+    movie_id BIGINT NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_showtime_room FOREIGN KEY (room_id) REFERENCES room (id),
+    CONSTRAINT fk_showtime_movie FOREIGN KEY (movie_id) REFERENCES movie (id)
+);
+
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE reservation (
+    id BIGINT PRIMARY KEY NOT NULL,
+    user_id BIGINT NOT NULL,
+    showtime_id BIGINT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    CONSTRAINT fk_reservation_user FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_reservation_showtime FOREIGN KEY (showtime_id) REFERENCES showtime (id)
+);
+
+CREATE TABLE reservation_seat (
+    reservation_id BIGINT NOT NULL,
+    seat_id BIGINT NOT NULL,
+    showtime_id BIGINT NOT NULL,
+    CONSTRAINT pk_reservation_seat PRIMARY KEY (reservation_id, seat_id, showtime_id),
+    CONSTRAINT uk_reservation_seat_showtime_seat UNIQUE (showtime_id, seat_id),
+    CONSTRAINT fk_reservation_seat_reservation FOREIGN KEY (reservation_id) REFERENCES reservation (id),
+    CONSTRAINT fk_reservation_seat_seat FOREIGN KEY (seat_id) REFERENCES seat (id),
+    CONSTRAINT fk_reservation_seat_showtime FOREIGN KEY (showtime_id) REFERENCES showtime (id)
+);
