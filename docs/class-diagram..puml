@@ -1,0 +1,115 @@
+@startuml
+
+enum USER_ROLE {
+    ADMIN
+    CUSTOMER
+}
+
+enum RESERVATION_STATUS {
+    PENDING
+    CONFIRMED
+    CANCELLED
+}
+
+enum SEAT_ROW {
+    A
+    B
+    C
+    D
+    E
+    F
+}
+
+enum MOVIE_GENRE {
+    ACTION
+    COMEDY
+    DRAMA
+    HORROR
+    THRILLER
+    ROMANCE
+    ANIMATION
+}
+
+enum AGE_RATING {
+    ALL
+    AGE_6
+    AGE_12
+    AGE_16
+    AGE_18
+}
+
+
+
+entity USER {
+    id : string <<PK>>
+    name : string
+    email : string <<UNIQUE>>
+    password_hash : string
+    role : USER_ROLE
+}
+
+entity CINEMA {
+    id : string <<PK>>
+    name : string
+    location : string
+}
+
+entity ROOM {
+    id : string <<PK>>
+    cinema_id : string <<FK>>
+    number : string
+}
+
+entity SEAT {
+    id : string <<PK>>
+    room_id : string <<FK>>
+    seat_row : SEAT_ROW
+    seat_number : string
+}
+
+entity MOVIE {
+    id : string <<PK>>
+    title : string
+    description : longtext
+    poster_url : string
+    genre : MOVIE_GENRE
+    duration_minutes : int
+    age_rating : AGE_RATING
+}
+
+entity SHOWTIME {
+    id : string <<PK>>
+    room_id : string <<FK>>
+    movie_id : string <<FK>>
+    start_time : datetime
+    price : decimal
+}
+
+entity RESERVATION {
+    id : string <<PK>>
+    user_id : string <<FK>>
+    showtime_id : string <<FK>>
+    status : RESERVATION_STATUS
+    total_price : decimal
+    created_at : datetime
+}
+
+entity RESERVATION_SEAT {
+    reservation_id : string <<FK>>
+    seat_id : string <<FK>>
+    showtime_id : string <<FK>>
+}
+
+
+
+USER --{ RESERVATION : makes
+CINEMA --{ ROOM : has
+ROOM --{ SEAT : has
+ROOM --{ SHOWTIME : hosts
+MOVIE --{ SHOWTIME : shows_in
+SHOWTIME --{ RESERVATION : receives
+RESERVATION --{ RESERVATION_SEAT : includes
+SEAT --{ RESERVATION_SEAT : reserved_as
+SHOWTIME --{ RESERVATION_SEAT : locks
+
+@enduml
