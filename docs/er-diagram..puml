@@ -2,7 +2,7 @@
 @startuml
 
 object USER {
-    id
+    id : Long
     name
     email
     password_hash
@@ -10,26 +10,26 @@ object USER {
 }
 
 object CINEMA {
-    id
+    id : Long
     name
     location
 }
 
 object ROOM {
-    id
-    cinema_id
+    id : Long
+    cinema_id : Long
     number
 }
 
 object SEAT {
-    id
-    room_id
+    id : Long
+    room_id : Long
     seat_row
     seat_number
 }
 
 object MOVIE {
-    id
+    id : Long
     title
     description
     poster_url
@@ -39,26 +39,26 @@ object MOVIE {
 }
 
 object SHOWTIME {
-    id
-    room_id
-    movie_id
+    id : Long
+    room_id : Long
+    movie_id : Long
     start_time
     price
 }
 
 object RESERVATION {
-    id
-    user_id
-    showtime_id
+    id : Long
+    user_id : Long
+    showtime_id : Long
     status
     total_price
     created_at
 }
 
 object RESERVATION_SEAT {
-    reservation_id
-    seat_id
-    showtime_id
+    reservation_id : Long
+    seat_id : Long
+    showtime_id : Long
 }
 
 USER --{ RESERVATION : makes

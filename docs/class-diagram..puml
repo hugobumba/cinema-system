@@ -41,7 +41,7 @@ enum AGE_RATING {
 
 
 entity USER {
-    id : string <<PK>>
+    id : Long <<PK>>
     name : string
     email : string <<UNIQUE>>
     password_hash : string
@@ -49,26 +49,26 @@ entity USER {
 }
 
 entity CINEMA {
-    id : string <<PK>>
+    id : Long <<PK>>
     name : string
     location : string
 }
 
 entity ROOM {
-    id : string <<PK>>
-    cinema_id : string <<FK>>
+    id : Long <<PK>>
+    cinema_id : Long <<FK>>
     number : string
 }
 
 entity SEAT {
-    id : string <<PK>>
-    room_id : string <<FK>>
+    id : Long <<PK>>
+    room_id : Long <<FK>>
     seat_row : SEAT_ROW
     seat_number : string
 }
 
 entity MOVIE {
-    id : string <<PK>>
+    id : Long <<PK>>
     title : string
     description : longtext
     poster_url : string
@@ -78,26 +78,26 @@ entity MOVIE {
 }
 
 entity SHOWTIME {
-    id : string <<PK>>
-    room_id : string <<FK>>
-    movie_id : string <<FK>>
+    id : Long <<PK>>
+    room_id : Long <<FK>>
+    movie_id : Long <<FK>>
     start_time : datetime
     price : decimal
 }
 
 entity RESERVATION {
-    id : string <<PK>>
-    user_id : string <<FK>>
-    showtime_id : string <<FK>>
+    id : Long <<PK>>
+    user_id : Long <<FK>>
+    showtime_id : Long <<FK>>
     status : RESERVATION_STATUS
     total_price : decimal
     created_at : datetime
 }
 
 entity RESERVATION_SEAT {
-    reservation_id : string <<FK>>
-    seat_id : string <<FK>>
-    showtime_id : string <<FK>>
+    reservation_id : Long <<FK>>
+    seat_id : Long <<FK>>
+    showtime_id : Long <<FK>>
 }
 
 
