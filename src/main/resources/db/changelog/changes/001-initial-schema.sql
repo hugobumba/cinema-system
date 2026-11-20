@@ -20,7 +20,7 @@ CREATE TABLE movie (
     description TEXT NOT NULL,
     poster_url VARCHAR(512),
     genre VARCHAR(50) NOT NULL,
-    duration_in_minutes INT NOT NULL,
+    duration_minutes INT NOT NULL,
     age_rating VARCHAR(50) NOT NULL
 );
 
