@@ -4,6 +4,7 @@ import com.hugobumba.cinemasystem.room.Room;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "cinema")
 public class Cinema {
     @EqualsAndHashCode.Include
     @Id
