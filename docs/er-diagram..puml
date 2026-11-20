@@ -52,7 +52,9 @@ object RESERVATION {
     showtime_id : Long
     status
     total_price
+    discount
     created_at
+    updated_at
 }
 
 object RESERVATION_SEAT {
