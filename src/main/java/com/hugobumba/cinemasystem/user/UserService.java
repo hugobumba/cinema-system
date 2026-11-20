@@ -44,9 +44,8 @@ public class UserService {
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + id));
     }
 
-    public User getUserByName(String name) {
-        return userRepository.findByName(name)
-                .orElseThrow(() -> new NoSuchElementException("User not found for name: " + name));
+    public List<User> getUsersByRole(String role) {
+        return userRepository.findByRole(role);
     }
 
     public List<User> listAllUsers() {

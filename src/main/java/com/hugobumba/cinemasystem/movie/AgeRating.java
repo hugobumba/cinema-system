@@ -2,8 +2,8 @@ package com.hugobumba.cinemasystem.movie;
 
 public enum AgeRating {
     ALL,
-    A_6,
-    A_12,
-    A_16,
-    A_18
+    AGE_6,
+    AGE_12,
+    AGE_16,
+    AGE_18
 }

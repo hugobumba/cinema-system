@@ -15,6 +15,6 @@ public class MovieResponseDTO {
     private String description;
     private String posterUrl;
     private MovieGenre genre;
-    private Integer durationMinutes;
+    private Integer durationInMinutes;
     private AgeRating ageRating;
 }

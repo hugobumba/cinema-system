@@ -49,7 +49,7 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public List<Room> listRoomsByCinema(Long cinemaId) {
+    public List<Room> listRoomsByCinemaId(Long cinemaId) {
         return roomRepository.findByCinemaId(cinemaId);
     }
 
