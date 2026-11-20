@@ -35,11 +35,6 @@ public class CinemaService {
                 .orElseThrow(() -> new NoSuchElementException("Cinema not found: " + id));
     }
 
-    public Cinema getCinemaByName(String name) {
-        return cinemaRepository.findByName(name)
-                .orElseThrow(() -> new NoSuchElementException("Cinema not found: " + name));
-    }
-
     public List<Cinema> listAllCinemas() {
         return cinemaRepository.findAll();
     }
