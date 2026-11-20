@@ -43,7 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/role/{role}")
-    public List<UserResponseDTO> getUsersByRole(@PathVariable String role) {
+    public List<UserResponseDTO> getUsersByRole(@PathVariable UserRole role) {
         List<User> users = userService.getUsersByRole(role);
         return users.stream()
                 .map(this::toResponse)

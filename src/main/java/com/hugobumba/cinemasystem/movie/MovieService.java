@@ -36,7 +36,7 @@ public class MovieService {
         if (movie.getAgeRating() == null) {
             throw new IllegalArgumentException("Movie age rating is required");
         }
-        if (movie.durationInMinutes() == null || movie.durationInMinutes() <= 0) {
+        if (movie.getDurationInMinutes() == null || movie.getDurationInMinutes() <= 0) {
             throw new IllegalArgumentException("Movie duration must be greater than zero");
         }
         return movieRepository.save(movie);
@@ -76,14 +76,14 @@ public class MovieService {
         if (movie.getAgeRating() == null) {
             throw new IllegalArgumentException("Movie age rating is required");
         }
-        if (movie.durationInMinutes() == null || movie.durationInMinutes() <= 0) {
+        if (movie.getDurationInMinutes() == null || movie.getDurationInMinutes() <= 0) {
             throw new IllegalArgumentException("Movie duration must be greater than zero");
         }
         existingMovie.setTitle(movie.getTitle());
         existingMovie.setDescription(movie.getDescription());
         existingMovie.setPosterUrl(movie.getPosterUrl());
         existingMovie.setGenre(movie.getGenre());
-        existingMovie.durationInMinutes(movie.durationInMinutes());
+        existingMovie.setDurationInMinutes(movie.getDurationInMinutes());
         existingMovie.setAgeRating(movie.getAgeRating());
         return movieRepository.save(existingMovie);
     }

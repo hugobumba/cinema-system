@@ -44,7 +44,7 @@ public class UserService {
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + id));
     }
 
-    public List<User> getUsersByRole(String role) {
+    public List<User> getUsersByRole(UserRole role) {
         return userRepository.findByRole(role);
     }
 

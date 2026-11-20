@@ -83,7 +83,7 @@ public class MovieController {
         response.setDescription(movie.getDescription());
         response.setPosterUrl(movie.getPosterUrl());
         response.setGenre(movie.getGenre());
-        response.durationInMinutes(movie.durationInMinutes());
+        response.setDurationInMinutes(movie.getDurationInMinutes());
         response.setAgeRating(movie.getAgeRating());
         return response;
     }
