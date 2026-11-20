@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -51,9 +52,10 @@ public class ShowtimeService {
                 .orElseThrow(() -> new NoSuchElementException("Room not found: " + showtime.getRoom().getId()));
         Movie movie = movieRepository.findById(showtime.getMovie().getId())
                 .orElseThrow(() -> new NoSuchElementException("Movie not found: " + showtime.getMovie().getId()));
-        if(showtimeRepository.existsByRoomIdAndStartTime(room.getId(), showtime.getStartTime())) {
-            throw new IllegalArgumentException("Showtime already exists for room " + room.getId() + " at " + showtime.getStartTime());
+        if (movie.getDurationInMinutes() == null || movie.getDurationInMinutes() <= 0) {
+            throw new IllegalArgumentException("Movie duration must be greater than zero");
         }
+        validateNoScheduleConflict(room.getId(), showtime.getStartTime(), movie.getDurationInMinutes(), null);
 
         showtime.setRoom(room);
         showtime.setMovie(movie);
@@ -99,9 +101,10 @@ public class ShowtimeService {
                 .orElseThrow(() -> new NoSuchElementException("Room not found: " + showtime.getRoom().getId()));
         Movie movie = movieRepository.findById(showtime.getMovie().getId())
                 .orElseThrow(() -> new NoSuchElementException("Movie not found: " + showtime.getMovie().getId()));
-        if (showtimeRepository.existsByRoomIdAndStartTimeAndIdNot(room.getId(), showtime.getStartTime(), showtime.getId())) {
-            throw new IllegalArgumentException("Showtime already exists for room " + room.getId() + " at " + showtime.getStartTime());
+        if (movie.getDurationInMinutes() == null || movie.getDurationInMinutes() <= 0) {
+            throw new IllegalArgumentException("Movie duration must be greater than zero");
         }
+        validateNoScheduleConflict(room.getId(), showtime.getStartTime(), movie.getDurationInMinutes(), showtime.getId());
 
         existing.setRoom(room);
         existing.setMovie(movie);
@@ -121,5 +124,34 @@ public class ShowtimeService {
         }
 
         showtimeRepository.delete(showtime);
+    }
+
+    private void validateNoScheduleConflict(Long roomId, LocalDateTime startTime, Integer durationInMinutes, Long excludedShowtimeId) {
+        LocalDateTime requestedEndTime = startTime.plusMinutes(durationInMinutes.longValue());
+        List<Showtime> roomShowtimes = showtimeRepository.findByRoomId(roomId);
+
+        for (Showtime existingShowtime : roomShowtimes) {
+            if (excludedShowtimeId != null && excludedShowtimeId.equals(existingShowtime.getId())) {
+                continue;
+            }
+
+            boolean overlaps = isOverlaps(startTime, existingShowtime, requestedEndTime);
+
+            if (overlaps) {
+                throw new IllegalArgumentException(
+                        "Showtime overlaps with existing showtime " + existingShowtime.getId() + " in room " + roomId
+                );
+            }
+        }
+    }
+
+    private static boolean isOverlaps(LocalDateTime startTime, Showtime existingShowtime, LocalDateTime requestedEndTime) {
+        if (existingShowtime.getMovie() == null || existingShowtime.getMovie().getDurationInMinutes() == null) {
+            throw new IllegalStateException("Existing showtime is missing movie duration: " + existingShowtime.getId());
+        }
+
+        LocalDateTime existingStartTime = existingShowtime.getStartTime();
+        LocalDateTime existingEndTime = existingStartTime.plusMinutes(existingShowtime.getMovie().getDurationInMinutes().longValue());
+        return startTime.isBefore(existingEndTime) && existingStartTime.isBefore(requestedEndTime);
     }
 }
