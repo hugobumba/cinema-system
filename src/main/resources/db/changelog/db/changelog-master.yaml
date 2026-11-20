@@ -1,3 +1,7 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changes/001-initial-schema.sql
+  - include:
+      file: db/changelog/changes/010-seed-prod.sql
+  - include:
+      file: db/changelog/changes/020-seed-test.sql
