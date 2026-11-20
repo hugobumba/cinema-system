@@ -113,8 +113,12 @@ public class ReservationService {
     @Transactional
     public Reservation confirmReservation(Long reservationId) {
         Reservation reservation = getReservationById(reservationId);
+        expireIfPendingAndStarted(reservation);
         if (!(reservation.getStatus() == ReservationStatus.PENDING)) {
             throw new IllegalStateException("Only pending reservations can be confirmed");
+        }
+        if (reservation.getShowtime().getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot confirm reservation: showtime has already started");
         }
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservation.setUpdatedAt(LocalDateTime.now());
@@ -124,9 +128,13 @@ public class ReservationService {
     @Transactional
     public Reservation cancelReservation(Long reservationId) {
         Reservation reservation = getReservationById(reservationId);
+        expireIfPendingAndStarted(reservation);
 
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             throw new IllegalStateException("Cannot cancel reservation: already cancelled");
+        }
+        if (reservation.getStatus() == ReservationStatus.EXPIRED) {
+            throw new IllegalStateException("Cannot cancel reservation: already expired");
         }
         if(reservation.getShowtime().getStartTime().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Cannot cancel reservation: showtime has already started");
@@ -152,5 +160,14 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
         reservationSeatRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
+    }
+
+    private void expireIfPendingAndStarted(Reservation reservation) {
+        if (reservation.getStatus() == ReservationStatus.PENDING
+                && reservation.getShowtime().getStartTime().isBefore(LocalDateTime.now())) {
+            reservation.setStatus(ReservationStatus.EXPIRED);
+            reservation.setUpdatedAt(LocalDateTime.now());
+            reservationRepository.save(reservation);
+        }
     }
 }
