@@ -3,6 +3,7 @@ package com.hugobumba.cinemasystem.reservation;
 import com.hugobumba.cinemasystem.reservation.dtos.ReservationCreationRequestDTO;
 import com.hugobumba.cinemasystem.reservation.dtos.ReservationResponseDTO;
 import com.hugobumba.cinemasystem.reservation.dtos.ReservationStatusUpdateRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,7 +28,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ReservationResponseDTO createReservation(@RequestBody ReservationCreationRequestDTO request) {
+    public ReservationResponseDTO createReservation(@RequestBody @Valid ReservationCreationRequestDTO request) {
         Reservation reservation = reservationService.createReservation(
                 request.getUserId(),
                 request.getShowtimeId(),
@@ -65,7 +66,7 @@ public class ReservationController {
     @PatchMapping("/{id}/status")
     public ReservationResponseDTO updateReservationStatus(
             @PathVariable Long id,
-            @RequestBody ReservationStatusUpdateRequest request
+            @RequestBody @Valid ReservationStatusUpdateRequest request
     ) {
         if (request.getStatus() == ReservationStatus.CONFIRMED) {
             return toResponse(reservationService.confirmReservation(id));

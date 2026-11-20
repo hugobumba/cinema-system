@@ -2,6 +2,7 @@ package com.hugobumba.cinemasystem.movie;
 
 import com.hugobumba.cinemasystem.movie.dtos.MovieRequestDTO;
 import com.hugobumba.cinemasystem.movie.dtos.MovieResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public MovieResponseDTO createMovie(@RequestBody MovieRequestDTO request) {
+    public MovieResponseDTO createMovie(@RequestBody @Valid MovieRequestDTO request) {
         Movie movie = toEntity(request);
         Movie createdMovie = movieService.createMovie(movie);
         return toResponse(createdMovie);
@@ -52,7 +53,7 @@ public class MovieController {
     }
 
     @PutMapping("/{id}")
-    public MovieResponseDTO updateMovie(@PathVariable Long id, @RequestBody MovieRequestDTO request) {
+    public MovieResponseDTO updateMovie(@PathVariable Long id, @RequestBody @Valid MovieRequestDTO request) {
         Movie movie = toEntity(request);
         movie.setId(id);
         Movie updatedMovie = movieService.updateMovie(movie);

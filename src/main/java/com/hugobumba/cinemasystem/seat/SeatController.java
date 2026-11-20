@@ -3,6 +3,7 @@ package com.hugobumba.cinemasystem.seat;
 import com.hugobumba.cinemasystem.room.Room;
 import com.hugobumba.cinemasystem.seat.dtos.SeatRequestDTO;
 import com.hugobumba.cinemasystem.seat.dtos.SeatResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class SeatController {
     }
 
     @PostMapping
-    public SeatResponseDTO createSeat(@RequestBody SeatRequestDTO request) {
+    public SeatResponseDTO createSeat(@RequestBody @Valid SeatRequestDTO request) {
         Seat seat = toEntity(request);
         Seat createdSeat = seatService.createSeat(seat);
         return toResponse(createdSeat);
@@ -53,7 +54,7 @@ public class SeatController {
     }
 
     @PutMapping("/{id}")
-    public SeatResponseDTO updateSeat(@PathVariable Long id, @RequestBody SeatRequestDTO request) {
+    public SeatResponseDTO updateSeat(@PathVariable Long id, @RequestBody @Valid SeatRequestDTO request) {
         Seat seat = toEntity(request);
         seat.setId(id);
         Seat updatedSeat = seatService.updateSeat(seat);

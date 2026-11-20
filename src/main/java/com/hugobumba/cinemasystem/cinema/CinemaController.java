@@ -2,6 +2,7 @@ package com.hugobumba.cinemasystem.cinema;
 
 import com.hugobumba.cinemasystem.cinema.dtos.CinemaRequestDTO;
 import com.hugobumba.cinemasystem.cinema.dtos.CinemaResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class CinemaController {
     }
 
     @PostMapping
-    public CinemaResponseDTO createCinema(@RequestBody CinemaRequestDTO request) {
+    public CinemaResponseDTO createCinema(@RequestBody @Valid CinemaRequestDTO request) {
         Cinema cinema = toEntity(request);
         Cinema createdCinema = cinemaService.createCinema(cinema);
         return toResponse(createdCinema);
@@ -46,7 +47,7 @@ public class CinemaController {
     }
 
     @PutMapping("/{id}")
-    public CinemaResponseDTO updateCinema(@PathVariable Long id, @RequestBody CinemaRequestDTO request) {
+    public CinemaResponseDTO updateCinema(@PathVariable Long id, @RequestBody @Valid CinemaRequestDTO request) {
         Cinema cinema = toEntity(request);
         cinema.setId(id);
         Cinema updatedCinema = cinemaService.updateCinema(cinema);

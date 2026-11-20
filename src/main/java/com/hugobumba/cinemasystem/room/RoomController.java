@@ -3,6 +3,7 @@ package com.hugobumba.cinemasystem.room;
 import com.hugobumba.cinemasystem.cinema.Cinema;
 import com.hugobumba.cinemasystem.room.dtos.RoomRequestDTO;
 import com.hugobumba.cinemasystem.room.dtos.RoomResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public class RoomController {
     }
 
     @PostMapping
-    public RoomResponseDTO createRoom(@RequestBody RoomRequestDTO request) {
+    public RoomResponseDTO createRoom(@RequestBody @Valid RoomRequestDTO request) {
         Room room = toEntity(request);
         Room createdRoom = roomService.createRoom(room);
         return toResponse(createdRoom);
@@ -53,7 +54,7 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    public RoomResponseDTO updateRoom(@PathVariable Long id, @RequestBody RoomRequestDTO request) {
+    public RoomResponseDTO updateRoom(@PathVariable Long id, @RequestBody @Valid RoomRequestDTO request) {
         Room room = toEntity(request);
         room.setId(id);
         Room updatedRoom = roomService.updateRoom(room);

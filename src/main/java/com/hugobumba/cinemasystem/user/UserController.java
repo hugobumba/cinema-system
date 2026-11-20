@@ -2,6 +2,7 @@ package com.hugobumba.cinemasystem.user;
 
 import com.hugobumba.cinemasystem.user.dtos.UserRequestDTO;
 import com.hugobumba.cinemasystem.user.dtos.UserResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponseDTO createUser(@RequestBody UserRequestDTO request) {
+    public UserResponseDTO createUser(@RequestBody @Valid UserRequestDTO request) {
         User userEntity = toEntity(request);
         User createdUser = userService.createUser(userEntity);
         return toResponse(createdUser);
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO request) {
+    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody @Valid UserRequestDTO request) {
         User userEntity = toEntity(request);
         userEntity.setId(id);
         User updatedUser = userService.updateUser(userEntity);

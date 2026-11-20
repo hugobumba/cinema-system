@@ -4,6 +4,7 @@ import com.hugobumba.cinemasystem.movie.Movie;
 import com.hugobumba.cinemasystem.room.Room;
 import com.hugobumba.cinemasystem.showtime.dtos.ShowtimeRequestDTO;
 import com.hugobumba.cinemasystem.showtime.dtos.ShowtimeResponseDTO;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,7 @@ public class ShowtimeController {
     }
 
     @PostMapping
-    public ShowtimeResponseDTO createShowtime(@RequestBody ShowtimeRequestDTO request) {
+    public ShowtimeResponseDTO createShowtime(@RequestBody @Valid ShowtimeRequestDTO request) {
         Showtime showtime = toEntity(request);
         Showtime createdShowtime = showtimeService.createShowtime(showtime);
         return toResponse(createdShowtime);
@@ -56,7 +57,7 @@ public class ShowtimeController {
     }
 
     @PutMapping("/{id}")
-    public ShowtimeResponseDTO updateShowtime(@PathVariable Long id, @RequestBody ShowtimeRequestDTO request) {
+    public ShowtimeResponseDTO updateShowtime(@PathVariable Long id, @RequestBody @Valid ShowtimeRequestDTO request) {
         Showtime showtime = toEntity(request);
         showtime.setId(id);
         Showtime updatedShowtime = showtimeService.updateShowtime(showtime);
