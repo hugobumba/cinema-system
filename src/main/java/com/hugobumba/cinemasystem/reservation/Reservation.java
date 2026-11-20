@@ -44,8 +44,6 @@ public class Reservation {
 
     private Double totalPrice;
 
-    private Double discount;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

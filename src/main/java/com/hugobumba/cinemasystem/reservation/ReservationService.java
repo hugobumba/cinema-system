@@ -50,7 +50,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation createReservation(Long userId, Long showtimeId, List<Long> seatIds, Double discount) {
+    public Reservation createReservation(Long userId, Long showtimeId, List<Long> seatIds) {
         if (userId == null) {
             throw new IllegalArgumentException("User id is required");
         }
@@ -60,10 +60,6 @@ public class ReservationService {
         if (seatIds == null || seatIds.isEmpty()) {
             throw new IllegalArgumentException("At least one seat is required");
         }
-        if (discount == null || discount < 0 || discount > 1) {
-            throw new IllegalArgumentException("Discount must be between 0 and 1");
-        }
-
         Set<Long> uniqueSeatIds = new LinkedHashSet<>(seatIds);
         if (uniqueSeatIds.size() != seatIds.size()) {
             throw new IllegalArgumentException("Duplicate seat ids are not allowed");
@@ -96,8 +92,7 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setUpdatedAt(LocalDateTime.now());
-        reservation.setDiscount(discount);
-        reservation.setTotalPrice(showtime.getPrice() * uniqueSeatIds.size() * (1 - discount));
+        reservation.setTotalPrice(showtime.getPrice() * uniqueSeatIds.size());
         Reservation savedReservation = reservationRepository.save(reservation);
 
         Set<ReservationSeat> reservationSeats = new LinkedHashSet<>();

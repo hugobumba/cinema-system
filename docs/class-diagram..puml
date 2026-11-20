@@ -91,7 +91,6 @@ entity RESERVATION {
     showtime_id : Long <<FK>>
     status : RESERVATION_STATUS
     total_price : decimal
-    discount : decimal
     created_at : datetime
     updated_at : datetime
 }

@@ -56,7 +56,6 @@ CREATE TABLE reservation (
     showtime_id BIGINT NOT NULL,
     status VARCHAR(50) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
-    discount DECIMAL(10,2) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     CONSTRAINT fk_reservation_user FOREIGN KEY (user_id) REFERENCES users (id),
