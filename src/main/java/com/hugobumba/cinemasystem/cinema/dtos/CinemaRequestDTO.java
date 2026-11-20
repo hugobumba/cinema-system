@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CinemaRequestDTO {
-    private Long id;
-
     @NotBlank(message = "Cinema name is required")
     private String name;
 

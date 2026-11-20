@@ -10,8 +10,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RoomRequestDTO {
-    private Long id;
-
     @NotBlank(message = "Room number is required")
     private String number;
 

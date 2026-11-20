@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class ShowtimeRequestDTO {
-    private Long id;
-
     @NotNull(message = "Room id is required")
     private Long roomId;
 

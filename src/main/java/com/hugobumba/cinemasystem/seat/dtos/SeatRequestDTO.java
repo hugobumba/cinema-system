@@ -11,8 +11,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SeatRequestDTO {
-    private Long id;
-
     @NotNull(message = "Room id is required")
     private Long roomId;
 

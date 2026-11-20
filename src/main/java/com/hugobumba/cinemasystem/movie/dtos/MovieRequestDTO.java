@@ -12,8 +12,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MovieRequestDTO {
-    private Long id;
-
     @NotBlank(message = "Movie title is required")
     private String title;
 
