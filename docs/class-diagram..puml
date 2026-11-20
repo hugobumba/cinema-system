@@ -9,6 +9,7 @@ enum RESERVATION_STATUS {
     PENDING
     CONFIRMED
     CANCELLED
+    EXPIRED
 }
 
 enum SEAT_ROW {
@@ -82,7 +83,7 @@ entity SHOWTIME {
     room_id : Long <<FK>>
     movie_id : Long <<FK>>
     start_time : datetime
-    price : decimal
+    price : bigdecimal
 }
 
 entity RESERVATION {
@@ -90,7 +91,7 @@ entity RESERVATION {
     user_id : Long <<FK>>
     showtime_id : Long <<FK>>
     status : RESERVATION_STATUS
-    total_price : decimal
+    total_price : bigdecimal
     created_at : datetime
     updated_at : datetime
 }
