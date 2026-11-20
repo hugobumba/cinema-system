@@ -26,9 +26,6 @@ public class SeatService {
         if (seat == null) {
             throw new IllegalArgumentException("Seat is required");
         }
-        if (seat.getId() == null) {
-            throw new IllegalArgumentException("Seat id is required");
-        }
         if (seat.getRoom() == null || seat.getRoom().getId() == null) {
             throw new IllegalArgumentException("Room is required");
         }
@@ -37,9 +34,6 @@ public class SeatService {
         }
         if (seat.getSeatNumber() == null || seat.getSeatNumber().isBlank()) {
             throw new IllegalArgumentException("Seat number is required");
-        }
-        if (seatRepository.existsById(seat.getId())) {
-            throw new IllegalArgumentException("Seat already exists for id: " + seat.getId());
         }
         Long roomId = seat.getRoom().getId();
 
@@ -69,6 +63,10 @@ public class SeatService {
 
     public List<Seat> listSeatsByRoom(Long roomId) {
         return seatRepository.findByRoomId(roomId);
+    }
+
+    public List<Seat> listAvailableSeats(Long showtimeId) {
+        return seatRepository.findAvailableSeatsByShowtimeId(showtimeId);
     }
 
     @Transactional

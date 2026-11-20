@@ -38,6 +38,12 @@ public class SeatController {
         return toResponse(seat);
     }
 
+    @GetMapping("/available/{showtimeId}")
+    public List<SeatResponseDTO> listAvailableSeats(@PathVariable Long showtimeId) {
+        List<Seat> availableSeats = seatService.listAvailableSeats(showtimeId);
+        return availableSeats.stream().map(this::toResponse).toList();
+    }
+
     @GetMapping
     public List<SeatResponseDTO> listSeats(@RequestParam(required = false) Long roomId) {
         List<Seat> seats = roomId == null
@@ -61,7 +67,6 @@ public class SeatController {
 
     private Seat toEntity(SeatRequestDTO request) {
         Seat seat = new Seat();
-        seat.setId(request.getId());
         Room room = new Room();
         room.setId(request.getRoomId());
         seat.setRoom(room);
