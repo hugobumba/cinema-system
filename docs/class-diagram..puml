@@ -44,7 +44,7 @@ entity USER {
     id : Long <<PK>>
     name : string
     email : string <<UNIQUE>>
-    password_hash : string
+    password : string
     role : USER_ROLE
 }
 
@@ -73,7 +73,7 @@ entity MOVIE {
     description : longtext
     poster_url : string
     genre : MOVIE_GENRE
-    duration_minutes : int
+    duration_in_minutes : int
     age_rating : AGE_RATING
 }
 

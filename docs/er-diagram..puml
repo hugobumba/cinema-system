@@ -5,7 +5,7 @@ object USER {
     id : Long
     name
     email
-    password_hash
+    password
     role
 }
 
@@ -34,7 +34,7 @@ object MOVIE {
     description
     poster_url
     genre
-    duration_minutes
+    duration_in_minutes
     age_rating
 }
 
