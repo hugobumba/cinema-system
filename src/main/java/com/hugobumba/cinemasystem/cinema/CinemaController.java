@@ -60,7 +60,6 @@ public class CinemaController {
 
     private Cinema toEntity(CinemaRequestDTO request) {
         Cinema cinema = new Cinema();
-        cinema.setId(request.getId());
         cinema.setName(request.getName());
         cinema.setLocation(request.getLocation());
         return cinema;

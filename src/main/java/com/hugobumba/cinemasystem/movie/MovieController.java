@@ -66,7 +66,6 @@ public class MovieController {
 
     private Movie toEntity(MovieRequestDTO request) {
         Movie movie = new Movie();
-        movie.setId(request.getId());
         movie.setTitle(request.getTitle());
         movie.setDescription(request.getDescription());
         movie.setPosterUrl(request.getPosterUrl());

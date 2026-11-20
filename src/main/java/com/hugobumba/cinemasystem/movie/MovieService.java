@@ -21,9 +21,6 @@ public class MovieService {
         if (movie == null) {
             throw new IllegalArgumentException("Movie is required");
         }
-        if (movie.getId() == null) {
-            throw new IllegalArgumentException("Movie id is required");
-        }
         if (movie.getTitle() == null || movie.getTitle().isBlank()) {
             throw new IllegalArgumentException("Movie title is required");
         }

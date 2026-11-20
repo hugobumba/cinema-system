@@ -70,7 +70,6 @@ public class ShowtimeController {
 
     private Showtime toEntity(ShowtimeRequestDTO request) {
         Showtime showtime = new Showtime();
-        showtime.setId(request.getId());
         Room room = new Room();
         room.setId(request.getRoomId());
         showtime.setRoom(room);

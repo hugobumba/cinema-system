@@ -67,7 +67,6 @@ public class RoomController {
 
     private Room toEntity(RoomRequestDTO request) {
         Room room = new Room();
-        room.setId(request.getId());
         room.setNumber(request.getNumber());
         Cinema cinema = new Cinema();
         cinema.setId(request.getCinemaId());

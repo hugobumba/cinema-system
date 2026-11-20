@@ -25,9 +25,6 @@ public class RoomService {
         if (room == null) {
             throw new IllegalArgumentException("Room is required");
         }
-        if (room.getId() == null) {
-            throw new IllegalArgumentException("Room id is required");
-        }
         if (room.getNumber() == null || room.getNumber().isBlank()) {
             throw new IllegalArgumentException("Room number is required");
         }

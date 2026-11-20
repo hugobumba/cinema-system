@@ -21,9 +21,6 @@ public class CinemaService {
         if (cinema == null) {
             throw new IllegalArgumentException("Cinema is required");
         }
-        if (cinema.getId() == null) {
-            throw new IllegalArgumentException("Cinema id is required");
-        }
         if (cinema.getName() == null || cinema.getName().isBlank()) {
             throw new IllegalArgumentException("Cinema name is required");
         }
