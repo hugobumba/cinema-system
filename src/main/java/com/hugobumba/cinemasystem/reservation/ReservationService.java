@@ -9,6 +9,7 @@ import com.hugobumba.cinemasystem.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -92,7 +93,7 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.PENDING);
         reservation.setCreatedAt(LocalDateTime.now());
         reservation.setUpdatedAt(LocalDateTime.now());
-        reservation.setTotalPrice(showtime.getPrice() * uniqueSeatIds.size());
+        reservation.setTotalPrice(showtime.getPrice().multiply(BigDecimal.valueOf(uniqueSeatIds.size())));
         Reservation savedReservation = reservationRepository.save(reservation);
 
         Set<ReservationSeat> reservationSeats = new LinkedHashSet<>();
@@ -112,8 +113,8 @@ public class ReservationService {
     @Transactional
     public Reservation confirmReservation(Long reservationId) {
         Reservation reservation = getReservationById(reservationId);
-        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
-            throw new IllegalStateException("Cancelled reservation cannot be confirmed");
+        if (!(reservation.getStatus() == ReservationStatus.PENDING)) {
+            throw new IllegalStateException("Only pending reservations can be confirmed");
         }
         reservation.setStatus(ReservationStatus.CONFIRMED);
         reservation.setUpdatedAt(LocalDateTime.now());
@@ -123,6 +124,24 @@ public class ReservationService {
     @Transactional
     public Reservation cancelReservation(Long reservationId) {
         Reservation reservation = getReservationById(reservationId);
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot cancel reservation: already cancelled");
+        }
+        if(reservation.getShowtime().getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot cancel reservation: showtime has already started");
+        }
+        for (ReservationSeat reservationSeat : reservation.getReservationSeats()) {
+            Long showtimeId = reservationSeat.getShowtime().getId();
+            Long seatId = reservationSeat.getSeat().getId();
+            boolean isReserved = reservationSeatRepository.existsByIdShowtimeIdAndSeatId(showtimeId, seatId);
+            if (!isReserved) {
+                throw new IllegalStateException("Cannot cancel reservation: one or more seats are not reserved");
+            }
+            reservationSeatRepository.deleteByIdShowtimeIdAndSeatId(showtimeId, seatId);
+        }
+
+        reservation.setReservationSeats(new HashSet<>());
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservation.setUpdatedAt(LocalDateTime.now());
         return reservationRepository.save(reservation);

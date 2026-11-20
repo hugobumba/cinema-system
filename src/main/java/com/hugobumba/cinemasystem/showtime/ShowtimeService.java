@@ -8,6 +8,7 @@ import com.hugobumba.cinemasystem.room.RoomRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -34,9 +35,6 @@ public class ShowtimeService {
         if (showtime == null) {
             throw new IllegalArgumentException("Showtime is required");
         }
-        if (showtime.getId() == null) {
-            throw new IllegalArgumentException("Showtime id is required");
-        }
         if (showtime.getRoom() == null || showtime.getRoom().getId() == null) {
             throw new IllegalArgumentException("Room is required");
         }
@@ -46,11 +44,8 @@ public class ShowtimeService {
         if (showtime.getStartTime() == null) {
             throw new IllegalArgumentException("Showtime start time is required");
         }
-        if (showtime.getPrice() == null || showtime.getPrice() <= 0) {
+        if (showtime.getPrice() == null || showtime.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Showtime price must be greater than zero");
-        }
-        if (showtimeRepository.existsById(showtime.getId())) {
-            throw new IllegalArgumentException("Showtime already exists: " + showtime.getId());
         }
         Room room = roomRepository.findById(showtime.getRoom().getId())
                 .orElseThrow(() -> new NoSuchElementException("Room not found: " + showtime.getRoom().getId()));
@@ -97,7 +92,7 @@ public class ShowtimeService {
         if (showtime.getStartTime() == null) {
             throw new IllegalArgumentException("Showtime start time is required");
         }
-        if (showtime.getPrice() == null || showtime.getPrice() <= 0) {
+        if (showtime.getPrice() == null || showtime.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Showtime price must be greater than zero");
         }
         Room room = roomRepository.findById(showtime.getRoom().getId())

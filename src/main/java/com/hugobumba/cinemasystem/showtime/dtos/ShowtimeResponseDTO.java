@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Getter
 @Setter
@@ -13,5 +14,5 @@ public class ShowtimeResponseDTO {
     private Long roomId;
     private Long movieId;
     private LocalDateTime startTime;
-    private Double price;
+    private BigDecimal price;
 }
