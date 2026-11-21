@@ -68,13 +68,7 @@ public class ReservationController {
             @PathVariable Long id,
             @RequestBody @Valid ReservationStatusUpdateRequest request
     ) {
-        if (request.getStatus() == ReservationStatus.CONFIRMED) {
-            return toResponse(reservationService.confirmReservation(id));
-        }
-        if (request.getStatus() == ReservationStatus.CANCELLED) {
-            return toResponse(reservationService.cancelReservation(id));
-        }
-        throw new IllegalArgumentException("Unsupported status update: " + request.getStatus());
+        return toResponse(reservationService.updateReservationStatus(id, request.getStatus()));
     }
 
     @DeleteMapping("/{id}")

@@ -112,33 +112,40 @@ public class ReservationService {
 
     @Transactional
     public Reservation confirmReservation(Long reservationId) {
-        Reservation reservation = getReservationById(reservationId);
-        if (reservation.getStatus() != ReservationStatus.PENDING) {
-            throw new IllegalStateException("Cannot confirm reservation from status " + reservation.getStatus());
-        }
-        reservation.setStatus(ReservationStatus.CONFIRMED);
-        reservation.setUpdatedAt(LocalDateTime.now());
-        return reservationRepository.save(reservation);
+        return updateReservationStatus(reservationId, ReservationStatus.CONFIRMED);
     }
 
     @Transactional
     public Reservation cancelReservation(Long reservationId) {
-        Reservation reservation = getReservationById(reservationId);
-        if (reservation.getStatus() != ReservationStatus.PENDING && reservation.getStatus() != ReservationStatus.CONFIRMED) {
-            throw new IllegalStateException("Cannot cancel reservation from status " + reservation.getStatus());
-        }
-        for (ReservationSeat reservationSeat : reservation.getReservationSeats()) {
-            Long showtimeId = reservationSeat.getShowtime().getId();
-            Long seatId = reservationSeat.getSeat().getId();
-            boolean isReserved = reservationSeatRepository.existsByIdShowtimeIdAndSeatId(showtimeId, seatId);
-            if (!isReserved) {
-                throw new IllegalStateException("Cannot cancel reservation: one or more seats are not reserved");
-            }
-            reservationSeatRepository.deleteByIdShowtimeIdAndSeatId(showtimeId, seatId);
+        return updateReservationStatus(reservationId, ReservationStatus.CANCELLED);
+    }
+
+    @Transactional
+    public Reservation updateReservationStatus(Long reservationId, ReservationStatus targetStatus) {
+        if (targetStatus == null) {
+            throw new IllegalArgumentException("Reservation target status is required");
         }
 
-        reservation.setReservationSeats(new HashSet<>());
-        reservation.setStatus(ReservationStatus.CANCELLED);
+        Reservation reservation = getReservationById(reservationId);
+        ReservationStatus currentStatus = reservation.getStatus();
+        if (!isTransitionAllowed(currentStatus, targetStatus)) {
+            throw new IllegalStateException("Invalid reservation transition: " + currentStatus + " -> " + targetStatus);
+        }
+
+        if (targetStatus == ReservationStatus.CANCELLED) {
+            for (ReservationSeat reservationSeat : reservation.getReservationSeats()) {
+                Long showtimeId = reservationSeat.getShowtime().getId();
+                Long seatId = reservationSeat.getSeat().getId();
+                boolean isReserved = reservationSeatRepository.existsByIdShowtimeIdAndSeatId(showtimeId, seatId);
+                if (!isReserved) {
+                    throw new IllegalStateException("Cannot cancel reservation: one or more seats are not reserved");
+                }
+                reservationSeatRepository.deleteByIdShowtimeIdAndSeatId(showtimeId, seatId);
+            }
+            reservation.setReservationSeats(new HashSet<>());
+        }
+
+        reservation.setStatus(targetStatus);
         reservation.setUpdatedAt(LocalDateTime.now());
         return reservationRepository.save(reservation);
     }
@@ -148,5 +155,18 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
         reservationSeatRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
+    }
+
+    private boolean isTransitionAllowed(ReservationStatus from, ReservationStatus to) {
+        if (from == to) {
+            return false;
+        }
+        return switch (from) {
+            case PENDING -> to == ReservationStatus.CONFIRMED
+                    || to == ReservationStatus.CANCELLED
+                    || to == ReservationStatus.EXPIRED;
+            case CONFIRMED -> to == ReservationStatus.CANCELLED;
+            case CANCELLED, EXPIRED -> false;
+        };
     }
 }
