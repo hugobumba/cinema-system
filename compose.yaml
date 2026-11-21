@@ -1,9 +1,10 @@
 services:
   postgres:
     image: 'postgres:17'
+    container_name: 'postgres'
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=cinemasystem_db_dev'
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=postgres'
     ports:
       - '5432:5432'
