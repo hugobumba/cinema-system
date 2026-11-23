@@ -12,9 +12,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ReservationCreationRequestDTO {
-    @NotNull(message = "User id is required")
-    private Long userId;
-
     @NotNull(message = "Showtime id is required")
     private Long showtimeId;
 
