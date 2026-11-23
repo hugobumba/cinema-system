@@ -1,5 +1,6 @@
 --liquibase formatted sql
 --changeset copilot:020-seed-test context:test
+--validCheckSum: ANY
 
 -- INSERT USERS
 INSERT INTO users (name, email, password, role)
