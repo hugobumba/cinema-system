@@ -65,7 +65,13 @@ public class ReservationService {
     }
 
     @Transactional
-    public Reservation createReservation(Long userId, Long showtimeId, List<Long> seatIds) {
+    public Reservation createReservation(Long showtimeId, List<Long> seatIds) {
+        User currentUser = getCurrentAuthenticatedUser();
+        return createReservationForUser(currentUser.getId(), showtimeId, seatIds);
+    }
+
+    @Transactional
+    public Reservation createReservationForUser(Long userId, Long showtimeId, List<Long> seatIds) {
         if (userId == null) {
             throw new IllegalArgumentException("User id is required");
         }
@@ -82,7 +88,7 @@ public class ReservationService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
-        enforceUserAccess(user);
+        enforceUserCreationAccess(user);
         Showtime showtime = showtimeRepository.findById(showtimeId)
                 .orElseThrow(() -> new NoSuchElementException("Showtime not found: " + showtimeId));
 
@@ -140,24 +146,31 @@ public class ReservationService {
         if (targetStatus == null) {
             throw new IllegalArgumentException("Reservation target status is required");
         }
+        if (targetStatus == ReservationStatus.EXPIRED) {
+            throw new IllegalStateException("Reservations can only be expired by the expiration flow");
+        }
 
+        return applyReservationStatusTransition(reservationId, targetStatus, false);
+    }
+
+    @Transactional
+    public Reservation expireReservation(Long reservationId) {
+        return applyReservationStatusTransition(reservationId, ReservationStatus.EXPIRED, true);
+    }
+
+    private Reservation applyReservationStatusTransition(
+            Long reservationId,
+            ReservationStatus targetStatus,
+            boolean allowSystemExpiration
+    ) {
         Reservation reservation = getReservationById(reservationId);
         ReservationStatus currentStatus = reservation.getStatus();
-        if (!isTransitionAllowed(currentStatus, targetStatus)) {
+        if (!isTransitionAllowed(currentStatus, targetStatus, allowSystemExpiration)) {
             throw new IllegalStateException("Invalid reservation transition: " + currentStatus + " -> " + targetStatus);
         }
 
-        if (targetStatus == ReservationStatus.CANCELLED) {
-            for (ReservationSeat reservationSeat : reservation.getReservationSeats()) {
-                Long showtimeId = reservationSeat.getShowtime().getId();
-                Long seatId = reservationSeat.getSeat().getId();
-                boolean isReserved = reservationSeatRepository.existsByIdShowtimeIdAndSeatId(showtimeId, seatId);
-                if (!isReserved) {
-                    throw new IllegalStateException("Cannot cancel reservation: one or more seats are not reserved");
-                }
-                reservationSeatRepository.deleteByIdShowtimeIdAndSeatId(showtimeId, seatId);
-            }
-            reservation.setReservationSeats(new HashSet<>());
+        if (targetStatus == ReservationStatus.CANCELLED || targetStatus == ReservationStatus.EXPIRED) {
+            releaseReservedSeats(reservation, targetStatus);
         }
 
         reservation.setStatus(targetStatus);
@@ -180,10 +193,10 @@ public class ReservationService {
         }
     }
 
-    private void enforceUserAccess(User user) {
+    private void enforceUserCreationAccess(User targetUser) {
         User currentUser = getCurrentAuthenticatedUser();
         if (currentUser.getRole() == UserRole.CUSTOMER
-                && !user.getId().equals(currentUser.getId())) {
+                && !targetUser.getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("Customers can only create reservations for themselves");
         }
     }
@@ -199,14 +212,29 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("Authenticated user not found: " + email));
     }
 
-    private boolean isTransitionAllowed(ReservationStatus from, ReservationStatus to) {
+    private void releaseReservedSeats(Reservation reservation, ReservationStatus targetStatus) {
+        for (ReservationSeat reservationSeat : reservation.getReservationSeats()) {
+            Long showtimeId = reservationSeat.getShowtime().getId();
+            Long seatId = reservationSeat.getSeat().getId();
+            boolean isReserved = reservationSeatRepository.existsByIdShowtimeIdAndSeatId(showtimeId, seatId);
+            if (!isReserved) {
+                throw new IllegalStateException(
+                        "Cannot set reservation to " + targetStatus + ": one or more seats are not reserved"
+                );
+            }
+            reservationSeatRepository.deleteByIdShowtimeIdAndSeatId(showtimeId, seatId);
+        }
+        reservation.setReservationSeats(new HashSet<>());
+    }
+
+    private boolean isTransitionAllowed(ReservationStatus from, ReservationStatus to, boolean allowSystemExpiration) {
         if (from == to) {
             return false;
         }
         return switch (from) {
             case PENDING -> to == ReservationStatus.CONFIRMED
                     || to == ReservationStatus.CANCELLED
-                    || to == ReservationStatus.EXPIRED;
+                    || (allowSystemExpiration && to == ReservationStatus.EXPIRED);
             case CONFIRMED -> to == ReservationStatus.CANCELLED;
             case CANCELLED, EXPIRED -> false;
         };
