@@ -28,6 +28,7 @@ public class DevSeedSqlGenerator {
     private static final int ROOMS_PER_CINEMA = 4;
     private static final int SEAT_ROWS = 5;
     private static final int SEATS_PER_ROW = 10;
+    private static final String DEV_PASSWORD_HASH = "$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static void main(String[] args) throws IOException {
@@ -192,12 +193,12 @@ public class DevSeedSqlGenerator {
 
     private static List<UserSeed> buildUsers(Faker faker) {
         List<UserSeed> users = new ArrayList<>();
-        users.add(new UserSeed("Dev Admin", "admin@mail", "123", "ADMIN"));
+        users.add(new UserSeed("Dev Admin", "admin@mail", DEV_PASSWORD_HASH, "ADMIN"));
 
         for (int i = 0; i < CUSTOMER_COUNT; i++) {
             String name = faker.name().fullName();
             String email = "customer" + (i + 1) + "@mail";
-            users.add(new UserSeed(name, email, "123", "CUSTOMER"));
+            users.add(new UserSeed(name, email, DEV_PASSWORD_HASH, "CUSTOMER"));
         }
         return users;
     }

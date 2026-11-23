@@ -6,6 +6,10 @@ import com.hugobumba.cinemasystem.showtime.Showtime;
 import com.hugobumba.cinemasystem.showtime.ShowtimeRepository;
 import com.hugobumba.cinemasystem.user.User;
 import com.hugobumba.cinemasystem.user.UserRepository;
+import com.hugobumba.cinemasystem.user.UserRole;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,15 +42,25 @@ public class ReservationService {
     }
 
     public Reservation getReservationById(Long id) {
-        return reservationRepository.findById(id)
+        Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Reservation not found: " + id));
+        enforceReservationAccess(reservation);
+        return reservation;
     }
 
     public List<Reservation> listAllReservations() {
+        User currentUser = getCurrentAuthenticatedUser();
+        if (currentUser.getRole() == UserRole.CUSTOMER) {
+            return reservationRepository.findByUserId(currentUser.getId());
+        }
         return reservationRepository.findAll();
     }
 
     public List<Reservation> listReservationsByUser(Long userId) {
+        User currentUser = getCurrentAuthenticatedUser();
+        if (currentUser.getRole() == UserRole.CUSTOMER && !currentUser.getId().equals(userId)) {
+            throw new AccessDeniedException("Customers can only access their own reservations");
+        }
         return reservationRepository.findByUserId(userId);
     }
 
@@ -68,6 +82,7 @@ public class ReservationService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + userId));
+        enforceUserAccess(user);
         Showtime showtime = showtimeRepository.findById(showtimeId)
                 .orElseThrow(() -> new NoSuchElementException("Showtime not found: " + showtimeId));
 
@@ -155,6 +170,33 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
         reservationSeatRepository.deleteByReservationId(reservationId);
         reservationRepository.delete(reservation);
+    }
+
+    private void enforceReservationAccess(Reservation reservation) {
+        User currentUser = getCurrentAuthenticatedUser();
+        if (currentUser.getRole() == UserRole.CUSTOMER
+                && !reservation.getUser().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Customers can only access their own reservations");
+        }
+    }
+
+    private void enforceUserAccess(User user) {
+        User currentUser = getCurrentAuthenticatedUser();
+        if (currentUser.getRole() == UserRole.CUSTOMER
+                && !user.getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Customers can only create reservations for themselves");
+        }
+    }
+
+    private User getCurrentAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new AccessDeniedException("Authentication is required");
+        }
+
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("Authenticated user not found: " + email));
     }
 
     private boolean isTransitionAllowed(ReservationStatus from, ReservationStatus to) {
