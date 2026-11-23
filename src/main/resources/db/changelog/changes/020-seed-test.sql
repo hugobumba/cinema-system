@@ -3,11 +3,11 @@
 
 -- INSERT USERS
 INSERT INTO users (name, email, password, role)
-SELECT 'Hugo Bumba', 'hugo@mail', '123', 'ADMIN'
+SELECT 'Hugo Bumba', 'hugo@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'ADMIN'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'hugo@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'John Doe', 'john@mail', '123', 'CUSTOMER'
+SELECT 'John Doe', 'john@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'john@mail');
 
 --INSERT CINEMAS

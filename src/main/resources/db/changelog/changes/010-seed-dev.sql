@@ -5,47 +5,47 @@
 
 -- USERS
 INSERT INTO users (name, email, password, role)
-SELECT 'Dev Admin', 'admin@mail', '123', 'ADMIN'
+SELECT 'Dev Admin', 'admin@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'ADMIN'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Delmar Nienow', 'customer1@mail', '123', 'CUSTOMER'
+SELECT 'Delmar Nienow', 'customer1@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer1@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Dianna Effertz', 'customer2@mail', '123', 'CUSTOMER'
+SELECT 'Dianna Effertz', 'customer2@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer2@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'James Jenkins', 'customer3@mail', '123', 'CUSTOMER'
+SELECT 'James Jenkins', 'customer3@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer3@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Alexa Hagenes PhD', 'customer4@mail', '123', 'CUSTOMER'
+SELECT 'Alexa Hagenes PhD', 'customer4@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer4@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Stacie Gleichner', 'customer5@mail', '123', 'CUSTOMER'
+SELECT 'Stacie Gleichner', 'customer5@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer5@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Mr. Angel Kerluke', 'customer6@mail', '123', 'CUSTOMER'
+SELECT 'Mr. Angel Kerluke', 'customer6@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer6@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Avery Kuphal', 'customer7@mail', '123', 'CUSTOMER'
+SELECT 'Avery Kuphal', 'customer7@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer7@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Abbie Harber', 'customer8@mail', '123', 'CUSTOMER'
+SELECT 'Abbie Harber', 'customer8@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer8@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Vicky McLaughlin', 'customer9@mail', '123', 'CUSTOMER'
+SELECT 'Vicky McLaughlin', 'customer9@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer9@mail');
 
 INSERT INTO users (name, email, password, role)
-SELECT 'Jong Mohr DVM', 'customer10@mail', '123', 'CUSTOMER'
+SELECT 'Jong Mohr DVM', 'customer10@mail', '$2b$10$g5E3oJPLDKrmauOEP6gzl.f8jkhB8HqCS8SEYGdpfnaSpGQgF6f4q', 'CUSTOMER'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'customer10@mail');
 
 -- CINEMAS
@@ -1682,3 +1682,4 @@ WHERE c.name = 'Cinema Monahan Schroeder and Donnelly' AND r.number = '4'
   AND NOT EXISTS (
     SELECT 1 FROM showtime st WHERE st.room_id = r.id AND st.start_time = TIMESTAMP '2026-02-03 18:00:00'
   );
+
