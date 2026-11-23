@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/reservations/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .requestMatchers("/api/reservations/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/api/showtimes/**", "/api/movies/**").hasAnyRole("ADMIN", "CUSTOMER")
-                        .requestMatchers("/api/**").hasRole("ADMIN")
+                        .requestMatchers("/api/**").hasAnyRole("ADMIN", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
