@@ -150,20 +150,43 @@ public class ReservationService {
             throw new IllegalStateException("Reservations can only be expired by the expiration flow");
         }
 
-        return applyReservationStatusTransition(reservationId, targetStatus, false);
+        return applyReservationStatusTransition(reservationId, targetStatus, false, true);
     }
 
     @Transactional
     public Reservation expireReservation(Long reservationId) {
-        return applyReservationStatusTransition(reservationId, ReservationStatus.EXPIRED, true);
+        return applyReservationStatusTransition(reservationId, ReservationStatus.EXPIRED, true, false);
+    }
+
+    @Transactional
+    public void expirePendingReservationsBefore(LocalDateTime cutoffDateTime) {
+        if (cutoffDateTime == null) {
+            throw new IllegalArgumentException("Cutoff datetime is required");
+        }
+        List<Reservation> pendingReservations = reservationRepository
+                .findByStatusAndCreatedAtBefore(ReservationStatus.PENDING, cutoffDateTime);
+
+        for (Reservation pendingReservation : pendingReservations) {
+            applyReservationStatusTransition(
+                    pendingReservation.getId(),
+                    ReservationStatus.EXPIRED,
+                    true,
+                    false
+            );
+        }
     }
 
     private Reservation applyReservationStatusTransition(
             Long reservationId,
             ReservationStatus targetStatus,
-            boolean allowSystemExpiration
+            boolean allowSystemExpiration,
+            boolean enforceAccessControl
     ) {
-        Reservation reservation = getReservationById(reservationId);
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchElementException("Reservation not found: " + reservationId));
+        if (enforceAccessControl) {
+            enforceReservationAccess(reservation);
+        }
         ReservationStatus currentStatus = reservation.getStatus();
         if (!isTransitionAllowed(currentStatus, targetStatus, allowSystemExpiration)) {
             throw new IllegalStateException("Invalid reservation transition: " + currentStatus + " -> " + targetStatus);
