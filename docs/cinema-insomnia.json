@@ -1,0 +1,1773 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-24T00:00:00.000Z",
+  "__export_source": "cinema-collection",
+  "resources": [
+    {
+      "_id": "wrk_cinema_completo",
+      "_type": "workspace",
+      "name": "Cinema System - API e seguranca",
+      "description": "Colecao manual baseada no checkout 767f1b9 de 2026-11-24. Usar apenas base de dados de desenvolvimento/teste: alguns pedidos criam, alteram ou eliminam dados. Defina credenciais e execute os logins; copie accessToken para admin_token, customer_token e customer_b_token. Copie IDs reais das respostas para o ambiente; nao assuma que IDs 1 e 2 existem. Crie cinema, sala, lugares, filme e sessao futura nesta ordem antes de reservar. As descricoes indicam objetivos e condicoes; pedidos nao executam assercoes automaticamente. Os cenarios de seguranca assinalados como politica desejada podem detetar falhas na implementacao atual."
+    },
+    {
+      "_id": "env_cinema_completo",
+      "_type": "environment",
+      "parentId": "wrk_cinema_completo",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8090",
+        "admin_email": "preencher-admin@example.com",
+        "admin_password": "",
+        "customer_email": "cliente.a@example.com",
+        "customer_password": "",
+        "customer_b_email": "cliente.b@example.com",
+        "customer_b_password": "",
+        "admin_token": "",
+        "customer_token": "",
+        "customer_b_token": "",
+        "expired_token": "",
+        "cinema_id": 1,
+        "room_id": 1,
+        "other_room_id": 2,
+        "seat_id": 1,
+        "seat_b_id": 2,
+        "other_room_seat_id": 3,
+        "movie_id": 1,
+        "showtime_id": 1,
+        "customer_id": 1,
+        "customer_b_id": 2,
+        "reservation_id": 1,
+        "other_reservation_id": 2,
+        "missing_id": 99999999
+      }
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "01 - Autenticacao",
+      "description": "Registe dois clientes diferentes; preencha passwords no ambiente. Logins devolvem accessToken."
+    },
+    {
+      "_id": "req_cinema_001",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "01 - Registar cliente A",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "description": "Esperado: 200, role CUSTOMER e accessToken; guardar userId e token. Email tem de ser unico.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Cliente A\",\n  \"email\": \"{{ _.customer_email }}\",\n  \"password\": \"{{ _.customer_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_002",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "02 - Registar cliente B",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "description": "Esperado: 200, role CUSTOMER; guardar userId e token.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Cliente B\",\n  \"email\": \"{{ _.customer_b_email }}\",\n  \"password\": \"{{ _.customer_b_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_003",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "03 - Login administrador",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "description": "Esperado: 200; copiar accessToken para admin_token. Usar credenciais configuradas no ambiente.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.admin_email }}\",\n  \"password\": \"{{ _.admin_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_004",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "04 - Login cliente A",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "description": "Esperado: 200; copiar accessToken para customer_token. Usar credenciais configuradas no ambiente.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.customer_email }}\",\n  \"password\": \"{{ _.customer_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_005",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "05 - Login cliente B",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "description": "Esperado: 200; copiar accessToken para customer_b_token. Usar credenciais configuradas no ambiente.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.customer_b_email }}\",\n  \"password\": \"{{ _.customer_b_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_006",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "06 - Login com password errada",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "description": "Esperado: falha de autenticacao, sem accessToken; verificar resposta 401.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.customer_email }}\",\n  \"password\": \"password-errada\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_007",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "07 - Registo com email duplicado",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "description": "Depois do registo A. Esperado: rejeicao, sem criar segunda conta.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Duplicado\",\n  \"email\": \"{{ _.customer_email }}\",\n  \"password\": \"{{ _.customer_password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_008",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "08 - Registo com dados invalidos",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "description": "Esperado: 400 e erros de validacao.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"\",\n  \"email\": \"invalido\",\n  \"password\": \"1\"\n}"
+      }
+    },
+    {
+      "_id": "fld_cinema",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "02 - Cinemas",
+      "description": "Administracao e consultas. Os exemplos de escrita criam ou alteram dados."
+    },
+    {
+      "_id": "req_cinema_009",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "01 - Listar cinemas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/cinemas",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_010",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "02 - Filtrar por localizacao",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/cinemas",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "location",
+          "value": "Lisbon"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_011",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "03 - Consultar cinema",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/cinemas/{{ _.cinema_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_012",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "04 - Criar cinema",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/cinemas",
+      "description": "Copiar id retornado para cinema_id.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Cinema Insomnia\",\n  \"location\": \"Lisboa\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_013",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "05 - Atualizar cinema",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/cinemas/{{ _.cinema_id }}",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Cinema Insomnia Atualizado\",\n  \"location\": \"Lisboa\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_014",
+      "_type": "request",
+      "parentId": "fld_cinema",
+      "name": "06 - Eliminar cinema [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/cinemas/{{ _.cinema_id }}",
+      "description": "Executar apenas num registo descartavel sem dependencias.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "fld_room",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "03 - Salas",
+      "description": ""
+    },
+    {
+      "_id": "req_cinema_015",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "01 - Listar salas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/rooms",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_016",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "02 - Salas por cinema (query)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/rooms",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "cinemaId",
+          "value": "{{ _.cinema_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_017",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "03 - Salas por cinema (rota)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/rooms/cinema/{{ _.cinema_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_018",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "04 - Consultar sala",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/rooms/{{ _.room_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_019",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "05 - Criar sala",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/rooms",
+      "description": "Copiar id para room_id; para other_room_id criar outra sala com numero diferente.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"number\": \"1\",\n  \"cinemaId\": {{ _.cinema_id }}\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_020",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "06 - Atualizar sala",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/rooms/{{ _.room_id }}",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"number\": \"1\",\n  \"cinemaId\": {{ _.cinema_id }}\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_021",
+      "_type": "request",
+      "parentId": "fld_room",
+      "name": "07 - Eliminar sala [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/rooms/{{ _.room_id }}",
+      "description": "Executar apenas numa sala descartavel sem dependencias.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "fld_seats",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "04 - Lugares",
+      "description": ""
+    },
+    {
+      "_id": "req_cinema_022",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "01 - Listar lugares",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_023",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "02 - Listar lugares da sala",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "roomId",
+          "value": "{{ _.room_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_024",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "03 - Consultar lugar",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/{{ _.seat_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_025",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "04 - Criar lugar A1",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/seats",
+      "description": "Copiar id para seat_id; criar A2 e guardar em seat_b_id para cenarios com dois lugares.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"seatRow\": \"A\",\n  \"seatNumber\": \"1\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_026",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "05 - Criar lugar A2",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/seats",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"seatRow\": \"A\",\n  \"seatNumber\": \"2\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_027",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "06 - Atualizar lugar",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/seats/{{ _.seat_id }}",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"seatRow\": \"A\",\n  \"seatNumber\": \"1\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_028",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "07 - Disponiveis por sessao (cliente)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/available/{{ _.showtime_id }}",
+      "description": "Comparar lista antes e depois de criar e cancelar reserva.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_029",
+      "_type": "request",
+      "parentId": "fld_seats",
+      "name": "08 - Eliminar lugar [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/seats/{{ _.seat_id }}",
+      "description": "Executar apenas num lugar descartavel sem dependencias.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "fld_movies",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "05 - Filmes",
+      "description": ""
+    },
+    {
+      "_id": "req_cinema_030",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "01 - Listar filmes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_031",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "02 - Filtrar por genero (query)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "genre",
+          "value": "ACTION"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_032",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "03 - Filtrar por genero (rota)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies/genre/ACTION",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_033",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "04 - Consultar filme",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies/{{ _.movie_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_034",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "05 - Criar filme",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "Guardar id em movie_id.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Filme Insomnia\",\n  \"description\": \"Filme criado para testes de integracao manuais.\",\n  \"posterUrl\": \"https://example.com/poster.jpg\",\n  \"genre\": \"ACTION\",\n  \"durationInMinutes\": 120,\n  \"ageRating\": \"AGE_12\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_035",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "06 - Atualizar filme",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/movies/{{ _.movie_id }}",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Filme Insomnia\",\n  \"description\": \"Filme criado para testes de integracao manuais.\",\n  \"posterUrl\": \"https://example.com/poster.jpg\",\n  \"genre\": \"ACTION\",\n  \"durationInMinutes\": 120,\n  \"ageRating\": \"AGE_12\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_036",
+      "_type": "request",
+      "parentId": "fld_movies",
+      "name": "07 - Eliminar filme [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/movies/{{ _.movie_id }}",
+      "description": "Executar apenas num filme descartavel sem sessoes.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "fld_shows",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "06 - Sessoes",
+      "description": ""
+    },
+    {
+      "_id": "req_cinema_037",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "01 - Listar sessoes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_038",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "02 - Sessoes por filme",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "movieId",
+          "value": "{{ _.movie_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_039",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "03 - Sessoes por sala",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "roomId",
+          "value": "{{ _.room_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_040",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "04 - Consultar sessao",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/showtimes/{{ _.showtime_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_041",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "05 - Criar sessao futura",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "Guardar id em showtime_id; escolher horario futuro e nao sobreposto.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"movieId\": {{ _.movie_id }},\n  \"startTime\": \"2035-02-01T12:00:00\",\n  \"price\": 8.5\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_042",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "06 - Atualizar sessao",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/showtimes/{{ _.showtime_id }}",
+      "description": "",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"movieId\": {{ _.movie_id }},\n  \"startTime\": \"2035-02-01T12:00:00\",\n  \"price\": 8.5\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_043",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "07 - Criar sessao sobreposta",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "Apos criar sessao de 120 minutos as 12h. Esperado: rejeicao por sobreposicao.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"movieId\": {{ _.movie_id }},\n  \"startTime\": \"2035-02-01T12:30:00\",\n  \"price\": 8.5\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_044",
+      "_type": "request",
+      "parentId": "fld_shows",
+      "name": "08 - Eliminar sessao [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/showtimes/{{ _.showtime_id }}",
+      "description": "Executar apenas numa sessao descartavel sem reservas dependentes.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "fld_reservations",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "07 - Reservas e disponibilidade",
+      "description": "Testes dependentes: preparar sessao futura e lugares disponiveis."
+    },
+    {
+      "_id": "req_cinema_045",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "01 - Consultar lugares antes",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/available/{{ _.showtime_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_046",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "02 - Criar reserva cliente A",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: PENDING; copiar id para reservation_id. O utilizador vem do token, nao do body.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_047",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "03 - Consultar reserva A",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_048",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "04 - Listar minhas reservas",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_049",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "05 - Listar reservas de cliente (admin)",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "userId",
+          "value": "{{ _.customer_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_050",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "06 - Consultar lugar depois de reservar",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/available/{{ _.showtime_id }}",
+      "description": "O lugar reservado nao deve constar como disponivel.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_051",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "07 - Mesmo lugar por cliente B",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: conflito; a reserva A ainda tem de estar ativa.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_b_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_052",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "08 - Confirmar reserva A",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/confirm",
+      "description": "Esperado: CONFIRMED, desde que ainda esteja PENDING.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_053",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "09 - Cancelar reserva A",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/cancel",
+      "description": "Esperado: CANCELLED; testar antes de eliminar.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_054",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "10 - Verificar lugar libertado",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/available/{{ _.showtime_id }}",
+      "description": "O lugar deve voltar a aparecer apos cancelamento.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_055",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "11 - Confirmar reserva cancelada",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/confirm",
+      "description": "Esperado: 409 transicao invalida.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_056",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "12 - Reservar novamente lugar libertado (B)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: nova reserva PENDING; guardar id em other_reservation_id.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_b_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_057",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "13 - Criar reserva para cliente (admin)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations/admin",
+      "description": "Usar outro lugar disponivel. Este endpoint tem @PreAuthorize ADMIN.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userId\": {{ _.customer_id }},\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_b_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_058",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "14 - Mudar estado para CANCELLED",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/status",
+      "description": "Usar id de reserva ativa. O pedido nao e idempotente se ja estiver cancelada.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"CANCELLED\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_059",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "15 - Expirar manualmente",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/status",
+      "description": "Esperado: rejeicao; expiracao deve ocorrer pelo scheduler.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"EXPIRED\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_060",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "16 - Eliminar reserva [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}",
+      "description": "Eliminar apenas dados descartaveis. A remocao apaga o historico.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_061",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "17 - Verificar expiracao automatica",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}",
+      "description": "Criar nova reserva PENDING e guardar o id. Aguardar prazo de expiracao mais intervalo do scheduler; verificar EXPIRED. Nao ha endpoint HTTP de expiracao.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_062",
+      "_type": "request",
+      "parentId": "fld_reservations",
+      "name": "18 - Lugares apos expiracao",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/seats/available/{{ _.showtime_id }}",
+      "description": "Apos expiracao automatica, o lugar da reserva deve voltar a estar disponivel.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "fld_validation",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "08 - Validacoes e conflitos",
+      "description": ""
+    },
+    {
+      "_id": "req_cinema_063",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "01 - Reserva sem lugares",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: 400.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": []\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_064",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "02 - Reserva com lugares repetidos",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: 400.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_id }},\n    {{ _.seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_065",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "03 - Lugar de outra sala",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Definir other_room_seat_id com um lugar de sala diferente. Esperado: 400.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.other_room_seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_066",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "04 - Sessao inexistente",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: 404 se ID nao existir.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"showtimeId\": {{ _.missing_id }},\n  \"seatIds\": [\n    {{ _.seat_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_067",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "05 - Filme inexistente",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies/{{ _.missing_id }}",
+      "description": "Esperado: 404 se ID nao existir.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_068",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "06 - Criar filme com campos em falta",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "Esperado: rejeicao por validacao.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"\",\n  \"durationInMinutes\": 0\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_069",
+      "_type": "request",
+      "parentId": "fld_validation",
+      "name": "07 - Preco de sessao invalido",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/showtimes",
+      "description": "Esperado: 400.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"roomId\": {{ _.room_id }},\n  \"movieId\": {{ _.movie_id }},\n  \"startTime\": \"2035-02-01T12:00:00\",\n  \"price\": 0\n}"
+      }
+    },
+    {
+      "_id": "fld_security",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "09 - Autorizacao e isolamento",
+      "description": "Politicas desejadas podem detetar falhas no estado atual. Nao executar criacao/eliminacao em producao."
+    },
+    {
+      "_id": "req_cinema_070",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "01 - Catalogo sem token",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "Configuracao atual requer autenticacao; esperado 401.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {}
+    },
+    {
+      "_id": "req_cinema_071",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "02 - Token invalido",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: 401.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "token.invalido.assinatura"
+      }
+    },
+    {
+      "_id": "req_cinema_072",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "03 - Token expirado",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Preencher expired_token com um JWT real expirado. Esperado: 401.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.expired_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_073",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "04 - Cliente B consulta reserva de A",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}",
+      "description": "reservation_id deve pertencer ao cliente A. Esperado: 403.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_b_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_074",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "05 - Cliente B cancela reserva de A",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/reservations/{{ _.reservation_id }}/cancel",
+      "description": "Esperado: 403; estado de A nao deve mudar.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_b_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_075",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "06 - Cliente B lista reservas de A",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/reservations",
+      "description": "Esperado: 403.",
+      "headers": [],
+      "parameters": [
+        {
+          "name": "userId",
+          "value": "{{ _.customer_id }}"
+        }
+      ],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_b_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_076",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "07 - Cliente cria reserva para outro (rota admin)",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/reservations/admin",
+      "description": "Esperado: 403; nao criar reserva.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"userId\": {{ _.customer_b_id }},\n  \"showtimeId\": {{ _.showtime_id }},\n  \"seatIds\": [\n    {{ _.seat_b_id }}\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_077",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "08 - Cliente tenta criar filme [politica desejada]",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/movies",
+      "description": "Seguranca desejada: 403. A regra atual pode permitir a operacao e criar dados; usar BD descartavel.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"title\": \"Filme Insomnia\",\n  \"description\": \"Filme criado para testes de integracao manuais.\",\n  \"posterUrl\": \"https://example.com/poster.jpg\",\n  \"genre\": \"ACTION\",\n  \"durationInMinutes\": 120,\n  \"ageRating\": \"AGE_12\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_078",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "09 - Cliente lista utilizadores [politica desejada]",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users",
+      "description": "Seguranca desejada: 403. A regra atual pode devolver dados; usar contas ficticias.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_079",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "10 - Enviar role ADMIN no registo",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "description": "Usar email unico e verificar que o resultado nunca tem role ADMIN; servidor pode ignorar ou rejeitar campo extra.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {},
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Teste Papel\",\n  \"email\": \"teste-papel-unico@example.com\",\n  \"password\": \"Exemplo123!\",\n  \"role\": \"ADMIN\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_080",
+      "_type": "request",
+      "parentId": "fld_security",
+      "name": "11 - Cliente tenta criar admin [politica desejada]",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/users",
+      "description": "Seguranca desejada: 403. Implementacao atual pode criar admin; usar APENAS BD descartavel e verificar/limpar.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.customer_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Teste Admin\",\n  \"email\": \"nao-criar-admin@example.com\",\n  \"password\": \"Exemplo123!\",\n  \"role\": \"ADMIN\"\n}"
+      }
+    },
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "parentId": "wrk_cinema_completo",
+      "name": "10 - Utilizadores [administracao]",
+      "description": "Algumas permissoes de admin ainda nao estao aplicadas na API; usar admin_token."
+    },
+    {
+      "_id": "req_cinema_081",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "01 - Listar utilizadores",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_082",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "02 - Consultar utilizador por ID",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users/{{ _.customer_id }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_083",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "03 - Consultar por email",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users/email/{{ _.customer_email }}",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_084",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "04 - Listar por papel",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/users/role/CUSTOMER",
+      "description": "",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    },
+    {
+      "_id": "req_cinema_085",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "05 - Criar utilizador",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/users",
+      "description": "Email deve ser unico. Nao reutilizar IDs de dados reais.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Utilizador Insomnia\",\n  \"email\": \"insomnia-user@example.com\",\n  \"password\": \"Exemplo123!\",\n  \"role\": \"CUSTOMER\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_086",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "06 - Atualizar utilizador",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/users/{{ _.customer_id }}",
+      "description": "ATENCAO: altera email, password e role do ID configurado; usar conta descartavel.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      },
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Utilizador Insomnia\",\n  \"email\": \"insomnia-user@example.com\",\n  \"password\": \"Exemplo123!\",\n  \"role\": \"CUSTOMER\"\n}"
+      }
+    },
+    {
+      "_id": "req_cinema_087",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "07 - Eliminar utilizador [destrutivo]",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/users/{{ _.customer_id }}",
+      "description": "Executar apenas numa conta descartavel sem dependencias.",
+      "headers": [],
+      "parameters": [],
+      "authentication": {
+        "type": "bearer",
+        "token": "{{ _.admin_token }}"
+      }
+    }
+  ]
+}
